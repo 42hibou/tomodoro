@@ -1,6 +1,8 @@
 # tomodoro.co
-![tomodoro logo](https://i.imgur.com/BgIgdjl.png)  
-*the logo is a minimalist tomato*
+
+<p align="center">
+  <img src="https://i.imgur.com/RILfm0q.png" />
+</p>
 
 the name is a mix of "tomodachi" and "pomodoro", i'm really proud of it 👀
 
