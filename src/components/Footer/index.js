@@ -5,8 +5,8 @@ import DarkMode from '../DarkMode'
 
 const Footer = () => {
   return (
-    <Center minH='10vh'>
-      <VStack h="120" spacing={3}>
+    <Center minH={["35vh", "10vh"]}>
+      <VStack spacing={3}>
         <Center>
           <DarkMode></DarkMode>
         </Center>
