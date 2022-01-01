@@ -59,12 +59,11 @@ const seconds_60 = 60
 let timeLeftInSeconds
 let isPaused = true
 let isEditable = false
-let timerStarted = false
 let interval
 let endPomo
 
 const Pomodoro = () => {
-  const defaultPomo = { workPomo: 10, breakPomo: 5 }
+  const defaultPomo = { workPomo: 5, breakPomo: 3 }
 
   const persistentPomo = localStorage.getItem('pomos')
     ? JSON.parse(localStorage.getItem('pomos'))
@@ -73,6 +72,7 @@ const Pomodoro = () => {
 
   const [pomodoro, setPomodoro] = useState(persistentPomo.workPomo)
 
+  const [timerStarted, setTimerStarted] = useState(false)
   const [playPause, setPlayPause] = useState(isPaused)
   const [timer, setTimer] = useState(persistentPomo.workPomo)
 
@@ -80,24 +80,32 @@ const Pomodoro = () => {
   const [inputValue, setInputValue] = useState('')
 
   const [restart, setRestart] = useState(false)
-  // const [switchTimer, setSwitchTimer] = useState(true)
+  const [autoPlay, setAutoPlay] = useState(false)
 
   useEffect(() => {
     if (restart) {
       setTimer(pomodoro)
       setRestart(false)
       isPaused = true
+      setTimerStarted(false)
       setPlayPause(isPaused)
     }
   }, [restart])
 
+  useEffect(() => {  
+    if (autoPlay) {
+      updateDuration()
+      playPauseTimer()
+      console.log('in true')
+      // updateTimer()
+    }
+    console.log('out of true')
+  }, [autoPlay])
+
   useEffect(() => {
-    console.log("useEffect: play/pause button pressed")
+    // if the localStorage somehow got corrupted, this helps.
     if (JSON.parse(localStorage.getItem('pomos')).length === 0) {
       JSON.stringify(localStorage.setItem('pomos', JSON.stringify(defaultPomo)))
-      // setPomodoro(defaultPomo)
-      // setTimer(pomodoro)
-      console.log("I AM HERE AND THE LOCAL STORAGE IS EMPTY")
     }
   }, [playPause])
 
@@ -106,77 +114,132 @@ const Pomodoro = () => {
     localStorage.setItem('pomos', JSON.stringify(customPomo))
   }, [inputValue])
 
+  // sets the play/Pause button to Pause and TimerStarted to true
   const startTimer = () => {
+    isPaused = false
     setPlayPause(false)
-    timerStarted = true
-    endPomo = (Date.now() + 1000 * pomodoro)
-    timeLeftInSeconds = (endPomo - Date.now()) / 1000
-    // endPomo = (Date.now() + pomodoro * 1000)
-    // updateTimer()
-    // timeLeftInSeconds = pomodoro 
+    setTimerStarted(true)
   }
 
+  // stops the setInterval going in "interval" var
   const stopTimer = () => {
     clearInterval(interval)
+    isPaused = true
   }
 
+  // when the play/pause button is pressed
   const playPauseTimer = () => {
-    console.log(`PlayPauseTimer: endPomo: ${endPomo}`)
- 
-    // every time this function is called (when the play/pause button is pressed)
-    // it sets the current timer to endPomo. 
-    // endPomo being the time left until the end of the timer that was ORIGINALY SET
-    // it then creates an issue in the expected behavior of the timer for 
-    // every time the timer goes from pause back to play it starts from its 
-    // very beginning. 
-
-
-    console.log(`timerStared: ${timerStarted}`)
-
-
-    // }
-    
-    // endPomo = (Date.now() + 1000 * pomodoro)
+    console.log(`playPauseTimer pomodoro === ${pomodoro}`)
+    // endPomo is equal to the current time in miliseconds plus the time of the
+    // current pomodoro timer in milliseconds.  
+    // The total that is endPomo is an exact time in the future for when the 
+    // timer ends, relying on Date.now() gives us accuracy that we don't have
+    // otherwise.
+    endPomo = (Date.now() + 1000 * pomodoro)
+    // timeLeftInSeconds is the current time left in seconds until endPomo. DUH
     // timeLeftInSeconds = (endPomo - Date.now()) / 1000
- 
-    if (timeLeftInSeconds <= 0) {
-      timerStarted = false
-      startTimer()
 
-      // timeLeftInSeconds = pomodoro
-      setTimer(pomodoro)
-    }
-    isPaused = !isPaused
+    // the timer isn't paused anymore. at this point i'll document anything to 
+    // find my bug.
 
+    // if the timer isn't Started start the timer.
     if (!timerStarted) {
       startTimer()
+    } else {
+      console.log("timer is started")
     }
 
-    timerStarted = true
-
+    // if the timer isPausedd stops the timer, otherwise updates the timer
+    // every X milliseconds
+    console.log(isPaused)
     isPaused
       ? (setPlayPause(isPaused), stopTimer())
       : (setPlayPause(isPaused), (interval = setInterval(updateTimer, 500)))
   }
 
+
+  // update the timer displayed. 
   const updateTimer = () => {
-    console.log(timeLeftInSeconds)
 
-    // timeLeftInSeconds = Math.floor((pomodoro - Date.now()))
-    // timeLeftInSeconds--
-    // setTimer(timeLeftInSeconds)
-    // endPomo = ()
     timeLeftInSeconds = (endPomo - Date.now()) / 1000
-    if (timeLeftInSeconds < 0) {
-      timeLeftInSeconds = 0
-    }
-    setTimer(timeLeftInSeconds)
-    if (timeLeftInSeconds === 0) {
-      stopTimer()
-      setPlayPause(true)
+    // console.log(timeLeftInSeconds)
 
+    timeLeftInSeconds < 0 
+      ? timeLeftInSeconds = 0 
+      : setTimer(timeLeftInSeconds)
+
+    // console.log(timeLeftInSeconds)
+    // console.log(`${pomodoro} : ${JSON.parse(localStorage.getItem('pomos')).workPomo}`)
+    // console.log(`${pomodoro} : ${JSON.parse(localStorage.getItem('pomos')).breakPomo}`)
+
+    if (timeLeftInSeconds === 0) {
+      // console.log("current timeLeftInSeconds === 0")
+      // console.log("JSON.work " + JSON.parse(localStorage.getItem('pomos')).workPomo)
+      // console.log("JSON.break " + JSON.parse(localStorage.getItem('pomos')).breakPomo)
+      if (pomodoro === JSON.parse(localStorage.getItem('pomos')).workPomo) {
+          
+          setPomodoro(JSON.parse(localStorage.getItem('pomos')).breakPomo)  
+          endPomo = (Date.now() + 1000 * pomodoro)
+
+          setAutoPlay(true)
+        } else {
+          setPomodoro(JSON.parse(localStorage.getItem('pomos')).workPomo)
+          
+          stopTimer()
+          setPlayPause(true)
+          setAutoPlay(false)
+        }
+      // if(pomodoro === JSON.parse(localStorage.getItem('pomos')).workPomo) {
+        // console.log("00000000000000000000000000000000000000000000")
+      // console.log("pomodoro in updateTIMER"  + pomodoro)
+      // console.log(`${pomodoro} : ${JSON.parse(localStorage.getItem('pomos')).workPomo}`)
+      // console.log(`${pomodoro} : ${JSON.parse(localStorage.getItem('pomos')).breakPomo}`)
+
+      // } else {
+      // }
       playJingle()
     }
+
+  }
+
+
+
+  const updateDuration = () => {
+    if(isPaused) {
+      // console.log("pomodoro in updateduration"  + pomodoro)
+      console.log("updateDuration called")
+      console.log(`${pomodoro} === ${JSON.parse(localStorage.getItem('pomos')).workPomo}`)
+      if (pomodoro === JSON.parse(localStorage.getItem('pomos')).workPomo) {
+      // if current pomodoro timer equals workTimer set it to breakTimer
+        // console.log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
+
+        
+        setPomodoro(JSON.parse(localStorage.getItem('pomos')).breakPomo)
+        setAutoPlay(true)
+        timeLeftInSeconds = pomodoro
+
+        // timeLeftInSeconds = JSON.parse(localStorage.getItem('pomos')).breakPomo
+        setTimer(pomodoro)
+      } else {
+      // if current pomodoro timer equals breakTimer set it to workTimer
+        // console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+        setPomodoro(JSON.parse(localStorage.getItem('pomos')).workPomo)
+  
+        // timeLeftInSeconds = JSON.parse(localStorage.getItem('pomos')).workPomo
+        setTimer(pomodoro)
+      }
+      setTimerStarted(false)
+    }
+
+  }
+
+  const restartCountdown = () => {
+    timeLeftInSeconds = pomodoro
+    setTimer(timeLeftInSeconds)
+
+    setRestart(true)
+
+    stopTimer()
   }
 
   const playJingle = () => {
@@ -194,40 +257,15 @@ const Pomodoro = () => {
   }
 
   const formatTimeString = userInput => {
+    // formats userInput 
     parseInt(userInput)
     let minutes = Math.floor(userInput * seconds_60)
 
     return minutes
   }
 
-  const updateDuration = () => {
-    if(isPaused) {
-      if (pomodoro === persistentPomo.workPomo) {
-        setPomodoro(persistentPomo.breakPomo)
-  
-        timeLeftInSeconds = persistentPomo.breakPomo
-        setTimer(persistentPomo.breakPomo)
-      } else {
-        setPomodoro(persistentPomo.workPomo)
-  
-        timeLeftInSeconds = persistentPomo.workPomo
-        setTimer(persistentPomo.workPomo)
-      }
-    }
-
-  }
-
-  const restartCountdown = () => {
-    timeLeftInSeconds = pomodoro
-    setTimer(timeLeftInSeconds)
-
-    setRestart(true)
-
-    stopTimer()
-  }
-
   const submit = e => {
-    // e.preventDefault()
+    e.preventDefault()
     localStorage.setItem('pomos', JSON.stringify(customPomo))
   }
 
@@ -236,19 +274,7 @@ const Pomodoro = () => {
       <VStack spacing={6}>
         <Box>
           <Heading className='pomodoro' as='h2' size='3xl'>
-            {isEditable ? (
-              <Editable
-                textAlign='center'
-                defaultValue={displayTimeString(timer)}
-              >
-                <Container maxW='sm' centerContent>
-                  <EditablePreview />
-                  <EditableInput />
-                </Container>
-              </Editable>
-            ) : (
-              displayTimeString(timer)
-            )}
+              {displayTimeString(timer)}
           </Heading>
         </Box>
         <Box>
