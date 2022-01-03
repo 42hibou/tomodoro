@@ -80,7 +80,7 @@ const Pomodoro = () => {
   const [inputValue, setInputValue] = useState('')
 
   const [restart, setRestart] = useState(false)
-  const [autoPlay, setAutoPlay] = useState(false)
+  // const [autoPlay, setAutoPlay] = useState(false)
 
   useEffect(() => {
     if (restart) {
@@ -92,15 +92,15 @@ const Pomodoro = () => {
     }
   }, [restart])
 
-  useEffect(() => {  
-    if (autoPlay) {
-      updateDuration()
-      playPauseTimer()
-      console.log('in true')
-      // updateTimer()
-    }
-    console.log('out of true')
-  }, [autoPlay])
+  // useEffect(() => {  
+  //   if (autoPlay) {
+  //     updateDuration()
+  //     playPauseTimer()
+  //     console.log('in true')
+  //     // updateTimer()
+  //   }
+  //   console.log('out of true')
+  // }, [autoPlay])
 
   useEffect(() => {
     // if the localStorage somehow got corrupted, this helps.
@@ -129,29 +129,20 @@ const Pomodoro = () => {
 
   // when the play/pause button is pressed
   const playPauseTimer = () => {
-    console.log(`playPauseTimer pomodoro === ${pomodoro}`)
-    // endPomo is equal to the current time in miliseconds plus the time of the
-    // current pomodoro timer in milliseconds.  
-    // The total that is endPomo is an exact time in the future for when the 
-    // timer ends, relying on Date.now() gives us accuracy that we don't have
-    // otherwise.
     endPomo = (Date.now() + 1000 * pomodoro)
-    // timeLeftInSeconds is the current time left in seconds until endPomo. DUH
-    // timeLeftInSeconds = (endPomo - Date.now()) / 1000
+    timeLeftInSeconds = (endPomo - Date.now()) / 1000
+    if (timeLeftInSeconds <= 0) {
+      timeLeftInSeconds = pomodoro
+      setTimer(timeLeftInSeconds)
+    }
+    isPaused = !isPaused
 
-    // the timer isn't paused anymore. at this point i'll document anything to 
-    // find my bug.
-
-    // if the timer isn't Started start the timer.
     if (!timerStarted) {
       startTimer()
-    } else {
-      console.log("timer is started")
     }
 
-    // if the timer isPausedd stops the timer, otherwise updates the timer
-    // every X milliseconds
-    console.log(isPaused)
+    setTimerStarted(true)
+
     isPaused
       ? (setPlayPause(isPaused), stopTimer())
       : (setPlayPause(isPaused), (interval = setInterval(updateTimer, 500)))
@@ -162,41 +153,15 @@ const Pomodoro = () => {
   const updateTimer = () => {
 
     timeLeftInSeconds = (endPomo - Date.now()) / 1000
-    // console.log(timeLeftInSeconds)
-
-    timeLeftInSeconds < 0 
-      ? timeLeftInSeconds = 0 
-      : setTimer(timeLeftInSeconds)
-
-    // console.log(timeLeftInSeconds)
-    // console.log(`${pomodoro} : ${JSON.parse(localStorage.getItem('pomos')).workPomo}`)
-    // console.log(`${pomodoro} : ${JSON.parse(localStorage.getItem('pomos')).breakPomo}`)
-
+    if (timeLeftInSeconds < 0) {
+      timeLeftInSeconds = 0
+    }
+    setTimer(timeLeftInSeconds)
     if (timeLeftInSeconds === 0) {
-      // console.log("current timeLeftInSeconds === 0")
-      // console.log("JSON.work " + JSON.parse(localStorage.getItem('pomos')).workPomo)
-      // console.log("JSON.break " + JSON.parse(localStorage.getItem('pomos')).breakPomo)
-      if (pomodoro === JSON.parse(localStorage.getItem('pomos')).workPomo) {
-          
-          setPomodoro(JSON.parse(localStorage.getItem('pomos')).breakPomo)  
-          endPomo = (Date.now() + 1000 * pomodoro)
+      stopTimer()
+      isPaused = true
+      setPlayPause(isPaused)
 
-          setAutoPlay(true)
-        } else {
-          setPomodoro(JSON.parse(localStorage.getItem('pomos')).workPomo)
-          
-          stopTimer()
-          setPlayPause(true)
-          setAutoPlay(false)
-        }
-      // if(pomodoro === JSON.parse(localStorage.getItem('pomos')).workPomo) {
-        // console.log("00000000000000000000000000000000000000000000")
-      // console.log("pomodoro in updateTIMER"  + pomodoro)
-      // console.log(`${pomodoro} : ${JSON.parse(localStorage.getItem('pomos')).workPomo}`)
-      // console.log(`${pomodoro} : ${JSON.parse(localStorage.getItem('pomos')).breakPomo}`)
-
-      // } else {
-      // }
       playJingle()
     }
 
@@ -206,31 +171,18 @@ const Pomodoro = () => {
 
   const updateDuration = () => {
     if(isPaused) {
-      // console.log("pomodoro in updateduration"  + pomodoro)
-      console.log("updateDuration called")
-      console.log(`${pomodoro} === ${JSON.parse(localStorage.getItem('pomos')).workPomo}`)
-      if (pomodoro === JSON.parse(localStorage.getItem('pomos')).workPomo) {
-      // if current pomodoro timer equals workTimer set it to breakTimer
-        // console.log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
-
-        
-        setPomodoro(JSON.parse(localStorage.getItem('pomos')).breakPomo)
-        setAutoPlay(true)
-        timeLeftInSeconds = pomodoro
-
-        // timeLeftInSeconds = JSON.parse(localStorage.getItem('pomos')).breakPomo
-        setTimer(pomodoro)
-      } else {
-      // if current pomodoro timer equals breakTimer set it to workTimer
-        // console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
-        setPomodoro(JSON.parse(localStorage.getItem('pomos')).workPomo)
+      if (pomodoro === persistentPomo.workPomo) {
+        setPomodoro(persistentPomo.breakPomo)
   
-        // timeLeftInSeconds = JSON.parse(localStorage.getItem('pomos')).workPomo
-        setTimer(pomodoro)
+        timeLeftInSeconds = persistentPomo.breakPomo
+        setTimer(persistentPomo.breakPomo)
+      } else {
+        setPomodoro(persistentPomo.workPomo)
+  
+        timeLeftInSeconds = persistentPomo.workPomo
+        setTimer(persistentPomo.workPomo)
       }
-      setTimerStarted(false)
     }
-
   }
 
   const restartCountdown = () => {
