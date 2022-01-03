@@ -80,7 +80,6 @@ const Pomodoro = () => {
   const [inputValue, setInputValue] = useState('')
 
   const [restart, setRestart] = useState(false)
-  // const [switchTimer, setSwitchTimer] = useState(true)
 
   useEffect(() => {
     if (restart) {
@@ -90,6 +89,7 @@ const Pomodoro = () => {
       setPlayPause(isPaused)
     }
   }, [restart])
+
 
   useEffect(() => {
     console.log("useEffect: play/pause button pressed")
@@ -121,30 +121,12 @@ const Pomodoro = () => {
   }
 
   const playPauseTimer = () => {
-    console.log(`PlayPauseTimer: endPomo: ${endPomo}`)
- 
-    // every time this function is called (when the play/pause button is pressed)
-    // it sets the current timer to endPomo. 
-    // endPomo being the time left until the end of the timer that was ORIGINALY SET
-    // it then creates an issue in the expected behavior of the timer for 
-    // every time the timer goes from pause back to play it starts from its 
-    // very beginning. 
 
-
-    console.log(`timerStared: ${timerStarted}`)
-
-
-    // }
-    
-    // endPomo = (Date.now() + 1000 * pomodoro)
-    // timeLeftInSeconds = (endPomo - Date.now()) / 1000
- 
+    endPomo = (Date.now() + 1000 * pomodoro)
+    timeLeftInSeconds = (endPomo - Date.now()) / 1000
     if (timeLeftInSeconds <= 0) {
-      timerStarted = false
-      startTimer()
-
-      // timeLeftInSeconds = pomodoro
-      setTimer(pomodoro)
+      timeLeftInSeconds = pomodoro
+      setTimer(timeLeftInSeconds)
     }
     isPaused = !isPaused
 
@@ -152,7 +134,7 @@ const Pomodoro = () => {
       startTimer()
     }
 
-    timerStarted = true
+    setTimerStarted(true)
 
     isPaused
       ? (setPlayPause(isPaused), stopTimer())
@@ -170,6 +152,37 @@ const Pomodoro = () => {
     if (timeLeftInSeconds < 0) {
       timeLeftInSeconds = 0
     }
+    setTimer(timeLeftInSeconds)
+    if (timeLeftInSeconds === 0) {
+      stopTimer()
+      isPaused = true
+      setPlayPause(isPaused)
+
+      playJingle()
+    }
+
+  }
+
+
+
+  const updateDuration = () => {
+    if(isPaused) {
+      if (pomodoro === persistentPomo.workPomo) {
+        setPomodoro(persistentPomo.breakPomo)
+  
+        timeLeftInSeconds = persistentPomo.breakPomo
+        setTimer(persistentPomo.breakPomo)
+      } else {
+        setPomodoro(persistentPomo.workPomo)
+  
+        timeLeftInSeconds = persistentPomo.workPomo
+        setTimer(persistentPomo.workPomo)
+      }
+    }
+  }
+
+  const restartCountdown = () => {
+    timeLeftInSeconds = pomodoro
     setTimer(timeLeftInSeconds)
     if (timeLeftInSeconds === 0) {
       stopTimer()
