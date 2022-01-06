@@ -78,7 +78,7 @@ const ToDo = () => {
   return (
     <Center minH={["45vh","80vh"]}>
       <VStack spacing={8}>
-        <Heading>To Do</Heading>
+        <Heading>To-Do</Heading>
         <form onSubmit={submit}>
           <Input
             value={inputValue}

@@ -63,7 +63,7 @@ let interval
 let endPomo
 
 const Pomodoro = () => {
-  const defaultPomo = { workPomo: 5, breakPomo: 3 }
+  const defaultPomo = { workPomo: 1500, breakPomo: 300 }
 
   const persistentPomo = localStorage.getItem('pomos')
     ? JSON.parse(localStorage.getItem('pomos'))
@@ -217,7 +217,6 @@ const Pomodoro = () => {
   }
 
   const submit = e => {
-    e.preventDefault()
     localStorage.setItem('pomos', JSON.stringify(customPomo))
   }
 
@@ -271,7 +270,7 @@ const Pomodoro = () => {
                           <Input
                             isRequired
                             type='text'
-                            maxLength='2'
+                            maxLength='3'
                             onChange={e =>
                               setInputValue({
                                 ...customPomo,
@@ -290,7 +289,7 @@ const Pomodoro = () => {
                           <Input
                             isRequired
                             type='text'
-                            maxLength='2'
+                            maxLength='3'
                             onChange={e =>
                               setInputValue({
                                 ...customPomo,
@@ -306,25 +305,6 @@ const Pomodoro = () => {
                     </VStack>
                       {/* Content of the actual Popover */}
                     </Center>
-                    <Box align='right' flex={2}>
-                      <VStack>
-                      {/* <IoMdNotificationsOutline></IoMdNotificationsOutline> */}
-                      <Icon as={IoMdNotificationsOutline}/>
-                    
-                        <Slider
-                          aria-label='slider-ex-3'
-                          defaultValue={30}
-                          orientation='vertical'
-                          minH='32'
-                        >
-                          <SliderTrack>
-                            <SliderFilledTrack />
-                          </SliderTrack>
-                          <SliderThumb />
-                        </Slider>
-                        {/* Content of the sound slider */}
-                      </VStack>
-                      </Box>
                   </Flex>
 
                 </PopoverBody>
