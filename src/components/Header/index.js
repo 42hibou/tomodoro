@@ -1,13 +1,15 @@
 import React from 'react'
 
-import { Center } from '@chakra-ui/react'
-import TestTimer from '../TestTimer'
-import { IoMdAnalytics } from 'react-icons/io'
+import { Center, Icon } from '@chakra-ui/react'
+import DarkMode from '../DarkMode'
+import { IoMdMenu } from 'react-icons/io'
 
 const Header = () => {
   return (
-    <Center minH='10vh'>
-      {/* <TestTimer></TestTimer> */}
+    <Center minH='10vh' alignContent="right">
+        <Center>
+          <DarkMode></DarkMode>
+        </Center>
     </Center>
   )
 }

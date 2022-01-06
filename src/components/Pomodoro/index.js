@@ -59,12 +59,11 @@ const seconds_60 = 60
 let timeLeftInSeconds
 let isPaused = true
 let isEditable = false
-let timerStarted = false
 let interval
 let endPomo
 
 const Pomodoro = () => {
-  const defaultPomo = { workPomo: 10, breakPomo: 5 }
+  const defaultPomo = { workPomo: 1500, breakPomo: 300 }
 
   const persistentPomo = localStorage.getItem('pomos')
     ? JSON.parse(localStorage.getItem('pomos'))
@@ -73,6 +72,7 @@ const Pomodoro = () => {
 
   const [pomodoro, setPomodoro] = useState(persistentPomo.workPomo)
 
+  const [timerStarted, setTimerStarted] = useState(false)
   const [playPause, setPlayPause] = useState(isPaused)
   const [timer, setTimer] = useState(persistentPomo.workPomo)
 
@@ -86,18 +86,16 @@ const Pomodoro = () => {
       setTimer(pomodoro)
       setRestart(false)
       isPaused = true
+      setTimerStarted(false)
       setPlayPause(isPaused)
     }
   }, [restart])
 
 
   useEffect(() => {
-    console.log("useEffect: play/pause button pressed")
+    // if the localStorage somehow got corrupted, this helps.
     if (JSON.parse(localStorage.getItem('pomos')).length === 0) {
       JSON.stringify(localStorage.setItem('pomos', JSON.stringify(defaultPomo)))
-      // setPomodoro(defaultPomo)
-      // setTimer(pomodoro)
-      console.log("I AM HERE AND THE LOCAL STORAGE IS EMPTY")
     }
   }, [playPause])
 
@@ -106,22 +104,21 @@ const Pomodoro = () => {
     localStorage.setItem('pomos', JSON.stringify(customPomo))
   }, [inputValue])
 
+  // sets the play/Pause button to Pause and TimerStarted to true
   const startTimer = () => {
+    isPaused = false
     setPlayPause(false)
-    timerStarted = true
-    endPomo = (Date.now() + 1000 * pomodoro)
-    timeLeftInSeconds = (endPomo - Date.now()) / 1000
-    // endPomo = (Date.now() + pomodoro * 1000)
-    // updateTimer()
-    // timeLeftInSeconds = pomodoro 
+    setTimerStarted(true)
   }
 
+  // stops the setInterval going in "interval" var
   const stopTimer = () => {
     clearInterval(interval)
+    isPaused = true
   }
 
+  // when the play/pause button is pressed
   const playPauseTimer = () => {
-
     endPomo = (Date.now() + 1000 * pomodoro)
     timeLeftInSeconds = (endPomo - Date.now()) / 1000
     if (timeLeftInSeconds <= 0) {
@@ -141,13 +138,10 @@ const Pomodoro = () => {
       : (setPlayPause(isPaused), (interval = setInterval(updateTimer, 500)))
   }
 
-  const updateTimer = () => {
-    console.log(timeLeftInSeconds)
 
-    // timeLeftInSeconds = Math.floor((pomodoro - Date.now()))
-    // timeLeftInSeconds--
-    // setTimer(timeLeftInSeconds)
-    // endPomo = ()
+  // update the timer displayed. 
+  const updateTimer = () => {
+
     timeLeftInSeconds = (endPomo - Date.now()) / 1000
     if (timeLeftInSeconds < 0) {
       timeLeftInSeconds = 0
@@ -184,12 +178,10 @@ const Pomodoro = () => {
   const restartCountdown = () => {
     timeLeftInSeconds = pomodoro
     setTimer(timeLeftInSeconds)
-    if (timeLeftInSeconds === 0) {
-      stopTimer()
-      setPlayPause(true)
 
-      playJingle()
-    }
+    setRestart(true)
+
+    stopTimer()
   }
 
   const playJingle = () => {
@@ -207,40 +199,14 @@ const Pomodoro = () => {
   }
 
   const formatTimeString = userInput => {
+    // formats userInput 
     parseInt(userInput)
     let minutes = Math.floor(userInput * seconds_60)
 
     return minutes
   }
 
-  const updateDuration = () => {
-    if(isPaused) {
-      if (pomodoro === persistentPomo.workPomo) {
-        setPomodoro(persistentPomo.breakPomo)
-  
-        timeLeftInSeconds = persistentPomo.breakPomo
-        setTimer(persistentPomo.breakPomo)
-      } else {
-        setPomodoro(persistentPomo.workPomo)
-  
-        timeLeftInSeconds = persistentPomo.workPomo
-        setTimer(persistentPomo.workPomo)
-      }
-    }
-
-  }
-
-  const restartCountdown = () => {
-    timeLeftInSeconds = pomodoro
-    setTimer(timeLeftInSeconds)
-
-    setRestart(true)
-
-    stopTimer()
-  }
-
   const submit = e => {
-    // e.preventDefault()
     localStorage.setItem('pomos', JSON.stringify(customPomo))
   }
 
@@ -249,19 +215,7 @@ const Pomodoro = () => {
       <VStack spacing={6}>
         <Box>
           <Heading className='pomodoro' as='h2' size='3xl'>
-            {isEditable ? (
-              <Editable
-                textAlign='center'
-                defaultValue={displayTimeString(timer)}
-              >
-                <Container maxW='sm' centerContent>
-                  <EditablePreview />
-                  <EditableInput />
-                </Container>
-              </Editable>
-            ) : (
-              displayTimeString(timer)
-            )}
+              {displayTimeString(timer)}
           </Heading>
         </Box>
         <Box>
@@ -306,7 +260,7 @@ const Pomodoro = () => {
                           <Input
                             isRequired
                             type='text'
-                            maxLength='2'
+                            maxLength='3'
                             onChange={e =>
                               setInputValue({
                                 ...customPomo,
@@ -325,7 +279,7 @@ const Pomodoro = () => {
                           <Input
                             isRequired
                             type='text'
-                            maxLength='2'
+                            maxLength='3'
                             onChange={e =>
                               setInputValue({
                                 ...customPomo,
@@ -341,25 +295,6 @@ const Pomodoro = () => {
                     </VStack>
                       {/* Content of the actual Popover */}
                     </Center>
-                    <Box align='right' flex={2}>
-                      <VStack>
-                      {/* <IoMdNotificationsOutline></IoMdNotificationsOutline> */}
-                      <Icon as={IoMdNotificationsOutline}/>
-                    
-                        <Slider
-                          aria-label='slider-ex-3'
-                          defaultValue={30}
-                          orientation='vertical'
-                          minH='32'
-                        >
-                          <SliderTrack>
-                            <SliderFilledTrack />
-                          </SliderTrack>
-                          <SliderThumb />
-                        </Slider>
-                        {/* Content of the sound slider */}
-                      </VStack>
-                      </Box>
                   </Flex>
 
                 </PopoverBody>

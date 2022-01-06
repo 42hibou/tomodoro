@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect }  from 'react'
+
 import { ColorModeScript, Heading } from '@chakra-ui/react'
 import ReactDOM from 'react-dom'
 import './index.css'
@@ -14,19 +15,23 @@ import Footer from './components/Footer'
 import theme from './config/theme'
 
 ReactDOM.render(
+
   <React.StrictMode>
-    <ChakraProvider theme={theme}>
-      <ColorModeScript initialColorMode={theme.config.initialColorMode} />
-      <Header></Header>
-      <SimpleGrid columns={[1, null, 2]}>
-        <Pomodoro></Pomodoro>
-        <ToDo></ToDo>
-      </SimpleGrid>
-      <Footer></Footer>
-    </ChakraProvider>
+      <ChakraProvider theme={theme}>
+        <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+        <Header></Header>
+        <SimpleGrid columns={[1, null, 2]}>
+          <Pomodoro></Pomodoro>
+          <ToDo></ToDo>
+        </SimpleGrid>
+          <Footer></Footer>
+      </ChakraProvider>
+
   </React.StrictMode>,
   document.getElementById('root')
 )
+
+
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
