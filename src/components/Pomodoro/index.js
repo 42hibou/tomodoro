@@ -185,6 +185,7 @@ const Pomodoro = () => {
   }
 
   const playJingle = () => {
+    audioJingle.volume = .25
     audioJingle.play()
   }
 
