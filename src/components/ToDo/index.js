@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useContext } from 'react'
+
+import { StreamerModeContext } from '../../App'
 
 import {
   Text,
@@ -16,6 +18,17 @@ const ToDo = () => {
   const [inputValue, setInputValue] = useState('')
   const [firstClick, setFirstClick] = useState(false)
   const timer = useRef()
+
+  const streamerMode = useContext(StreamerModeContext)
+
+  const [customHeight, setCustomHeight] = useState()
+
+  useEffect(() => {
+    streamerMode[0] ? 
+      setCustomHeight("60vh")
+    : setCustomHeight(["45vh", "80vh"]) 
+    console.log(customHeight)
+  }, [streamerMode])
 
   useEffect(() => {
     if (firstClick) {
@@ -76,7 +89,7 @@ const ToDo = () => {
   }
 
   return (
-    <Center minH={["45vh","80vh"]}>
+    <Center minH={customHeight}>
       <VStack spacing={8}>
         <Heading>To-Do</Heading>
         <form onSubmit={submit}>

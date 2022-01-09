@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import leftPad from 'just-left-pad'
 
 import {
@@ -51,6 +51,8 @@ import {
 
 
 import jingle from '../../audio/PomJingle.wav'
+import { StreamerModeContext } from '../../App'
+import ButtonSwitchTimer from '../ButtonSwitchTimer'
 
 const audioJingle = new Audio(jingle)
 
@@ -62,7 +64,13 @@ let isEditable = false
 let interval
 let endPomo
 
+let potato
+
 const Pomodoro = () => {
+
+  const streamerMode = useContext(StreamerModeContext)
+  const [customHeight, setCustomHeight] = useState()
+
   const defaultPomo = { workPomo: 1500, breakPomo: 300 }
 
   const persistentPomo = localStorage.getItem('pomos')
@@ -80,7 +88,7 @@ const Pomodoro = () => {
   const [inputValue, setInputValue] = useState('')
 
   const [restart, setRestart] = useState(false)
-  // const [autoPlay, setAutoPlay] = useState(false)
+
 
   useEffect(() => {
     if (restart) {
@@ -92,15 +100,6 @@ const Pomodoro = () => {
     }
   }, [restart])
 
-  // useEffect(() => {  
-  //   if (autoPlay) {
-  //     updateDuration()
-  //     playPauseTimer()
-  //     console.log('in true')
-  //     // updateTimer()
-  //   }
-  //   console.log('out of true')
-  // }, [autoPlay])
 
   useEffect(() => {
     // if the localStorage somehow got corrupted, this helps.
@@ -113,6 +112,13 @@ const Pomodoro = () => {
     setCustomPomo(inputValue)
     localStorage.setItem('pomos', JSON.stringify(customPomo))
   }, [inputValue])
+
+  useEffect(() => {
+    streamerMode[0] ? 
+      setCustomHeight("40vh")
+    : setCustomHeight(["45vh", "80vh"]) 
+    console.log(customHeight)
+  }, [streamerMode])
 
   // sets the play/Pause button to Pause and TimerStarted to true
   const startTimer = () => {
@@ -151,7 +157,6 @@ const Pomodoro = () => {
 
   // update the timer displayed. 
   const updateTimer = () => {
-
     timeLeftInSeconds = (endPomo - Date.now()) / 1000
     if (timeLeftInSeconds < 0) {
       timeLeftInSeconds = 0
@@ -161,13 +166,9 @@ const Pomodoro = () => {
       stopTimer()
       isPaused = true
       setPlayPause(isPaused)
-
       playJingle()
     }
-
   }
-
-
 
   const updateDuration = () => {
     if(isPaused) {
@@ -195,6 +196,7 @@ const Pomodoro = () => {
   }
 
   const playJingle = () => {
+    audioJingle.volume = .25
     audioJingle.play()
   }
 
@@ -220,8 +222,11 @@ const Pomodoro = () => {
     localStorage.setItem('pomos', JSON.stringify(customPomo))
   }
 
+
   return (
-    <Center minH={["45vh","80vh"]}>
+    // <Center minH={["45vh","80vh"]}>
+
+    <Center minH={customHeight}>
       <VStack spacing={6}>
         <Box>
           <Heading className='pomodoro' as='h2' size='3xl'>
