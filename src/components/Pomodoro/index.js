@@ -77,7 +77,6 @@ const Pomodoro = () => {
     ? JSON.parse(localStorage.getItem('pomos'))
     : defaultPomo
 
-
   const [pomodoro, setPomodoro] = useState(persistentPomo.workPomo)
 
   const [timerStarted, setTimerStarted] = useState(false)
@@ -89,13 +88,16 @@ const Pomodoro = () => {
 
   const [restart, setRestart] = useState(false)
 
+
+
   useEffect(() => {
+    console.log(restart)
     if (restart) {
       setTimer(pomodoro)
-      setRestart(false)
-      isPaused = true
+      setPlayPause(true)
       setTimerStarted(false)
-      setPlayPause(isPaused)
+      setRestart(false)
+      stopTimer()
     }
   }, [restart])
 
@@ -184,15 +186,6 @@ const Pomodoro = () => {
     }
   }
 
-  const restartCountdown = () => {
-    timeLeftInSeconds = pomodoro
-    setTimer(timeLeftInSeconds)
-
-    setRestart(true)
-
-    stopTimer()
-  }
-
   const playJingle = () => {
     audioJingle.volume = .25
     audioJingle.play()
@@ -238,7 +231,7 @@ const Pomodoro = () => {
             <Button title="Play/Pause Current Timer" onClick={playPauseTimer}>
               {playPause ? <Icon as={IoMdPlay} /> : <Icon as={IoMdPause} />}
             </Button>
-            <Button title="Restart Current Timer" onClick={restartCountdown}>
+            <Button title="Restart Current Timer" onClick={() => setRestart(!restart)}>
               <Icon as={IoMdRepeat} />
             </Button>
           </ButtonGroup>
