@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, createContext } from 'react'
 import leftPad from 'just-left-pad'
 
 import {
@@ -51,11 +51,12 @@ import {
 
 
 import jingle from '../../audio/PomJingle.wav'
-import { StreamerModeContext } from '../../App'
-import ButtonSwitchTimer from '../ButtonSwitchTimer'
+import { PomoButtonsContext, StreamerModeContext } from '../../App'
+import ButtonRestart from '../ButtonRestart'
 
 const audioJingle = new Audio(jingle)
 
+// the best const you've ever seen
 const seconds_60 = 60
 
 let timeLeftInSeconds
@@ -64,11 +65,11 @@ let isEditable = false
 let interval
 let endPomo
 
-let potato
-
 const Pomodoro = () => {
 
   const streamerContextObj = useContext(StreamerModeContext)
+  const PomoButtonsObj = useContext(PomoButtonsContext)
+
   const [customHeight, setCustomHeight] = useState()
 
   const defaultPomo = { workPomo: 1500, breakPomo: 300 }
@@ -86,20 +87,19 @@ const Pomodoro = () => {
   const [customPomo, setCustomPomo] = useState(persistentPomo)
   const [inputValue, setInputValue] = useState('')
 
-  const [restart, setRestart] = useState(false)
-
+  // const [restart, setRestart] = useState(false)
 
 
   useEffect(() => {
-    console.log(restart)
-    if (restart) {
+    console.log(PomoButtonsObj.restart)
+    if (PomoButtonsObj.restart) {
       setTimer(pomodoro)
       setPlayPause(true)
       setTimerStarted(false)
-      setRestart(false)
+      PomoButtonsObj.setRestart(false)
       stopTimer()
     }
-  }, [restart])
+  }, [PomoButtonsObj.restart])
 
   useEffect(() => {
     // if the localStorage somehow got corrupted, this helps.
@@ -224,17 +224,15 @@ const Pomodoro = () => {
           </Heading>
         </Box>
         <Box>
-          <ButtonGroup size='md' spacing={4} direction='row' align='center'>
-            <Button title="Switch timers" onClick={updateDuration}>
-              <Icon as={IoMdHourglass} />
-            </Button>
-            <Button title="Play/Pause Current Timer" onClick={playPauseTimer}>
-              {playPause ? <Icon as={IoMdPlay} /> : <Icon as={IoMdPause} />}
-            </Button>
-            <Button title="Restart Current Timer" onClick={() => setRestart(!restart)}>
-              <Icon as={IoMdRepeat} />
-            </Button>
-          </ButtonGroup>
+            <ButtonGroup size='md' spacing={4} direction='row' align='center'>
+              <Button title="Switch timers" onClick={updateDuration}>
+                <Icon as={IoMdHourglass} />
+              </Button>
+              <Button title="Play/Pause Current Timer" onClick={playPauseTimer}>
+                {playPause ? <Icon as={IoMdPlay} /> : <Icon as={IoMdPause} />}
+              </Button>
+              <ButtonRestart></ButtonRestart>
+            </ButtonGroup>
         </Box>
         <Box>
           <Center>
@@ -243,7 +241,6 @@ const Pomodoro = () => {
                 <Button title='Settings'>
                   {' '}
                   <Icon as={IoMdSettings} />
-                  {/* <IoMdOptions></IoMdOptions> */}
                 </Button>
               </PopoverTrigger>
               <PopoverContent>

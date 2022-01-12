@@ -16,14 +16,19 @@ import WebcamPlaceholder from './components/WebcamPlaceholder'
 import theme from './config/theme'
 
 export const StreamerModeContext = createContext() 
+export const PomoButtonsContext = createContext()
 
 const App = () => {
   const [streamerMode, setStreamerMode] = useState(false)
-  const streamerContextObj = new Object()
+  const [restart, setRestart] = useState(false)
 
+  const streamerContextObj = new Object()
   streamerContextObj.streamerMode = streamerMode
   streamerContextObj.setStreamerMode = setStreamerMode
 
+  const PomoButtonsObj = new Object()
+  PomoButtonsObj.restart = restart
+  PomoButtonsObj.setRestart = setRestart
   
 
   useEffect(() => {
@@ -32,32 +37,34 @@ const App = () => {
   
   return (
     <StreamerModeContext.Provider value={streamerContextObj}>
-      <ChakraProvider theme={theme}>
-        <ColorModeScript initialColorMode={theme.config.initialColorMode} />
-        { streamerMode ?
-        <span>
-          <Grid 
-          templateColumns='repeat(6, 1fr)' >
-            <GridItem colSpan={2}>
-              <Pomodoro></Pomodoro>
-              <ToDo></ToDo>
-            </GridItem>
-            <GridItem colSpan={4}>
-              <WebcamPlaceholder></WebcamPlaceholder>
-            </GridItem>
-          </Grid> 
-        </span> 
-          : 
+      <PomoButtonsContext.Provider value={PomoButtonsObj}>
+        <ChakraProvider theme={theme}>
+          <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+          { streamerMode ?
           <span>
-            <Header />
-            <SimpleGrid columns={[1, null, 2]}>
-              <Pomodoro></Pomodoro>
-              <ToDo></ToDo>
-            </SimpleGrid>   
-            <Footer />
-          </span>
-          }
-      </ChakraProvider>
+            <Grid 
+            templateColumns='repeat(6, 1fr)' >
+              <GridItem colSpan={2}>
+                <Pomodoro></Pomodoro>
+                <ToDo></ToDo>
+              </GridItem>
+              <GridItem colSpan={4}>
+                <WebcamPlaceholder></WebcamPlaceholder>
+              </GridItem>
+            </Grid> 
+          </span> 
+            : 
+            <span>
+              <Header />
+              <SimpleGrid columns={[1, null, 2]}>
+                <Pomodoro></Pomodoro>
+                <ToDo></ToDo>
+              </SimpleGrid>   
+              <Footer />
+            </span>
+            }
+        </ChakraProvider>
+      </PomoButtonsContext.Provider>
     </StreamerModeContext.Provider>
 
   )
