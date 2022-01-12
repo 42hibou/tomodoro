@@ -68,7 +68,7 @@ let potato
 
 const Pomodoro = () => {
 
-  const streamerMode = useContext(StreamerModeContext)
+  const streamerContextObj = useContext(StreamerModeContext)
   const [customHeight, setCustomHeight] = useState()
 
   const defaultPomo = { workPomo: 1500, breakPomo: 300 }
@@ -89,7 +89,6 @@ const Pomodoro = () => {
 
   const [restart, setRestart] = useState(false)
 
-
   useEffect(() => {
     if (restart) {
       setTimer(pomodoro)
@@ -99,7 +98,6 @@ const Pomodoro = () => {
       setPlayPause(isPaused)
     }
   }, [restart])
-
 
   useEffect(() => {
     // if the localStorage somehow got corrupted, this helps.
@@ -114,11 +112,11 @@ const Pomodoro = () => {
   }, [inputValue])
 
   useEffect(() => {
-    streamerMode[0] ? 
+    streamerContextObj.streamerMode ? 
       setCustomHeight("40vh")
     : setCustomHeight(["45vh", "80vh"]) 
     console.log(customHeight)
-  }, [streamerMode])
+  }, [streamerContextObj.streamerMode])
 
   // sets the play/Pause button to Pause and TimerStarted to true
   const startTimer = () => {
@@ -224,9 +222,8 @@ const Pomodoro = () => {
 
 
   return (
-    // <Center minH={["45vh","80vh"]}>
 
-    <Center minH={customHeight}>
+<Center minH={customHeight}>
       <VStack spacing={6}>
         <Box>
           <Heading className='pomodoro' as='h2' size='3xl'>

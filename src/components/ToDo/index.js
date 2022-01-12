@@ -19,16 +19,16 @@ const ToDo = () => {
   const [firstClick, setFirstClick] = useState(false)
   const timer = useRef()
 
-  const streamerMode = useContext(StreamerModeContext)
+  const streamerContextObj = useContext(StreamerModeContext)
 
   const [customHeight, setCustomHeight] = useState()
 
   useEffect(() => {
-    streamerMode[0] ? 
+    streamerContextObj.streamerMode ? 
       setCustomHeight("60vh")
     : setCustomHeight(["45vh", "80vh"]) 
     console.log(customHeight)
-  }, [streamerMode])
+  }, [streamerContextObj.streamerMode])
 
   useEffect(() => {
     if (firstClick) {

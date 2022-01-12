@@ -9,16 +9,16 @@ import { StreamerModeContext } from '../../App'
 
 const Header = (props) => {
 
-  const streamerMode = useContext(StreamerModeContext)
+  const streamerContextObj = useContext(StreamerModeContext)
 
   const [customHeight, setCustomHeight] = useState()
 
   useEffect(() => {
-    streamerMode[0] ? 
+    streamerContextObj.streamerMode ? 
       setCustomHeight("")
     : setCustomHeight("10vh") 
     console.log(customHeight)
-  }, [streamerMode])
+  }, [streamerContextObj])
 
   return (
     <Center minH={customHeight} alignContent="right">

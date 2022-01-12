@@ -15,16 +15,16 @@ const toggleStreamerMode = (streamerMode, setStreamerMode) => {
 
 const Footer = () => {
 
-  const streamerMode = useContext(StreamerModeContext)
+  const streamerContextObj = useContext(StreamerModeContext)
 
   const [customHeight, setCustomHeight] = useState()
 
   useEffect(() => {
-    streamerMode[0] ? 
+    streamerContextObj.streamerMode ? 
       setCustomHeight("")
     : setCustomHeight("10vh") 
     console.log(customHeight)
-  }, [streamerMode])
+  }, [streamerContextObj])
   
   const [isLargerThan1280] = useMediaQuery('(min-width: 1280px)')
 
