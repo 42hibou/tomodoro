@@ -26,8 +26,7 @@ import {
 
 import { IoMdSettings } from 'react-icons/io'
 
-import { PomoButtonsContext } from '../../App'
-import { PomoLogicContext } from '../../App'
+import { PomoButtonsContext, PomoLogicContext } from '../../App'
 
 const ButtonConfig = () => {
   const PomoButtonsObj = useContext(PomoButtonsContext)

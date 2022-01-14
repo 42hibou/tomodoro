@@ -11,6 +11,7 @@ const ToggleStreamerMode = () => {
 
   const toggleStreamerMode = (streamerContextObj) => {
     streamerContextObj.setStreamerMode(!streamerContextObj.streamerMode)
+    localStorage.setItem('streamerMode', !streamerContextObj.streamerMode)
   }
 
   return (

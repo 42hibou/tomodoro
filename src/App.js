@@ -25,11 +25,14 @@ const App = () => {
   //  console.log(`PomoButtonsObj.switchTimer: ${PomoButtonsObj.switchTimer}`)
   })
   
-  const [streamerMode, setStreamerMode] = useState(false)
+  const [streamerMode, setStreamerMode] = useState(JSON.parse(localStorage.getItem('streamerMode')))
+  const [toggleToDo, setToggleToDo] = useState(true)
 
   const streamerContextObj = new Object()
   streamerContextObj.streamerMode = streamerMode
   streamerContextObj.setStreamerMode = setStreamerMode
+  streamerContextObj.toggleToDo = toggleToDo
+  streamerContextObj.setToggleToDo = setToggleToDo
 
   const [restart, setRestart] = useState(false)
   const [playPause, setPlayPause] = useState(false) // false: Pause, true: Play
@@ -58,14 +61,13 @@ const App = () => {
   PomoLogicObj.persistentPomo = persistentPomo
   PomoLogicObj.defaultPomo = defaultPomo
 
-
   return (
     <StreamerModeContext.Provider value={streamerContextObj}>
       <PomoButtonsContext.Provider value={PomoButtonsObj}>
         <PomoLogicContext.Provider value={PomoLogicObj}>
           <ChakraProvider theme={theme}>
             <ColorModeScript initialColorMode={theme.config.initialColorMode} />
-            { streamerMode ?
+            { JSON.parse(localStorage.getItem('streamerMode')) ?
             <span>
               <Grid 
               templateColumns='repeat(6, 1fr)' >
