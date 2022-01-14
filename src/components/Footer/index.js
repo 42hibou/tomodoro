@@ -1,14 +1,38 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 
 import { Button, Center, Text, Link, VStack, Icon } from '@chakra-ui/react'
 import { SiGithub, SiPatreon } from "react-icons/si";
 import { MdCircle } from "react-icons/md";
 
-const Footer = (props) => {
+import { useMediaQuery } from '@chakra-ui/react'
+
+import { StreamerModeContext } from '../../App';
+import ToggleStreamerMode from '../ToggleStreamerMode';
+
+const toggleStreamerMode = (streamerMode, setStreamerMode) => {
+  setStreamerMode(!streamerMode)
+}
+
+const Footer = () => {
+
+  const streamerContextObj = useContext(StreamerModeContext)
+
+  const [customHeight, setCustomHeight] = useState()
+
+  useEffect(() => {
+    streamerContextObj.streamerMode ? 
+      setCustomHeight("")
+    : setCustomHeight("10vh") 
+    console.log(customHeight)
+  }, [streamerContextObj])
+  
+  const [isLargerThan1280] = useMediaQuery('(min-width: 1280px)')
 
   return (
-    <Center minH={["35vh", "10vh"]}>
+    <Center minH={customHeight}>
       <VStack spacing={3}>
+        <Center>
+        </Center>
         <Center>
           <Text as='samp'>
             <Link href='https://www.patreon.com/42hibou' isExternal>
@@ -28,10 +52,14 @@ const Footer = (props) => {
             <Link color="gray.500" href='https://idryskai.carrd.co/' isExternal>
               IdrysKai
             </Link>
+            {isLargerThan1280 ?
+              <span>{' '} | {' '}</span> : <></> }
+            <ToggleStreamerMode />
           </Text>
         </Center>
       </VStack>
     </Center>
+
   )
 }
 

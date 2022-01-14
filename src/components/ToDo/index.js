@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useContext } from 'react'
+
+import { StreamerModeContext } from '../../App'
 
 import {
   Text,
@@ -7,7 +9,7 @@ import {
   Heading,
   Input,
   Container,
-  Checkbox
+  Checkbox,
 } from '@chakra-ui/react'
 
 import { v4 as uuidv4 } from 'uuid'
@@ -16,6 +18,16 @@ const ToDo = () => {
   const [inputValue, setInputValue] = useState('')
   const [firstClick, setFirstClick] = useState(false)
   const timer = useRef()
+
+  const streamerContextObj = useContext(StreamerModeContext)
+
+  const [customHeight, setCustomHeight] = useState()
+
+  useEffect(() => {
+    streamerContextObj.streamerMode ? 
+      setCustomHeight("60vh")
+    : setCustomHeight(["45vh", "80vh"]) 
+  }, [streamerContextObj])
 
   useEffect(() => {
     if (firstClick) {
@@ -76,37 +88,39 @@ const ToDo = () => {
   }
 
   return (
-    <Center minH={["45vh","80vh"]}>
+    <Center minH={customHeight}>
+      { streamerContextObj.toggleToDo ?
       <VStack spacing={8}>
-        <Heading>To-Do</Heading>
-        <form onSubmit={submit}>
-          <Input
-            value={inputValue}
-            onChange={e => setInputValue(e.target.value)}
-            name='todo'
-            placeholder='Keep it simple.'
-            size='md'
-          />
-        </form>
-        <VStack align='left'>
-          {todoList.map(todo => {
-            return (
-              <Checkbox
-                key={todo.id}
-                isChecked={todo.state}
-                onChange={() => handleClick(todo)}
-              >
-                <Container maxW='sm'>
-                { todo.state 
-                  ? <Text as='s' color='gray.500'>{todo.label}</Text>
-                  : <Text>{todo.label}</Text>
-                } 
-                </Container>
-              </Checkbox>
-            )
-          })}{' '}
+          <Heading>To-Do</Heading>
+          <form onSubmit={submit}>
+            <Input
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              name='todo'
+              placeholder='Keep it simple.'
+              size='md'
+            />
+          </form>
+          <VStack align='left'>
+            {todoList.map(todo => {
+              return (
+                <Checkbox
+                  key={todo.id}
+                  isChecked={todo.state}
+                  onChange={() => handleClick(todo)}
+                >
+                  <Container maxW='sm'>
+                  { todo.state 
+                    ? <Text as='s' color='gray.500'>{todo.label}</Text>
+                    : <Text>{todo.label}</Text>
+                  } 
+                  </Container>
+                </Checkbox>
+              )
+            })}{' '}
+          </VStack>
         </VStack>
-      </VStack>
+      : <></> }
     </Center>
   )
 }

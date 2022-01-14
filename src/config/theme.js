@@ -1,4 +1,5 @@
 import { extendTheme } from '@chakra-ui/react'
+import { MdBluetooth } from 'react-icons/md'
 
 const config = {
   initialColorMode: 'dark',
