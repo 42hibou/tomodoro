@@ -27,7 +27,6 @@ const ToDo = () => {
     streamerContextObj.streamerMode ? 
       setCustomHeight("60vh")
     : setCustomHeight(["45vh", "80vh"]) 
-    console.log(customHeight)
   }, [streamerContextObj.streamerMode])
 
   useEffect(() => {

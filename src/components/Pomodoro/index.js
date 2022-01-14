@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext, createContext } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
+
 import leftPad from 'just-left-pad'
 
 import {
@@ -14,45 +15,24 @@ import {
   VisuallyHiddenInput,
   SimpleGrid,
   Icon,
-  InputRightAddon
+  InputRightAddon,
+  Center,
+  Heading,
+  Text
 } from '@chakra-ui/react'
-import { Center } from '@chakra-ui/react'
-import { Heading, Text } from '@chakra-ui/react'
-import { Editable, EditableInput, EditablePreview } from '@chakra-ui/react'
-
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverBody,
-  PopoverArrow,
-  PopoverCloseButton,
-  PopoverFooter
-} from '@chakra-ui/react'
-
-import {
-  IoMdPlay,
-  IoMdPause,
-  IoMdRepeat,
-  IoMdHourglass,
-  IoMdSettings,
-  IoMdOptions,
-  IoMdNotificationsOutline
-} from 'react-icons/io'
-
-import {
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderMark,
-} from '@chakra-ui/react'
-
 
 import jingle from '../../audio/PomJingle.wav'
-import { PomoButtonsContext, StreamerModeContext } from '../../App'
+
+import { 
+  PomoButtonsContext, 
+  PomoLogicContext, 
+  StreamerModeContext
+} from '../../App'
+
 import ButtonRestart from '../ButtonRestart'
+import ButtonPlayPause from '../ButtonPlayPause'
+import ButtonSwitchTimer from '../ButtonSwitchTimer'
+import ButtonConfig from '../ButtonConfig'
 
 const audioJingle = new Audio(jingle)
 
@@ -63,38 +43,27 @@ let timeLeftInSeconds
 let isPaused = true
 let isEditable = false
 let interval
-let endPomo
+let pomoTotalTimeLeft
 
 const Pomodoro = () => {
 
   const streamerContextObj = useContext(StreamerModeContext)
   const PomoButtonsObj = useContext(PomoButtonsContext)
+  const PomoLogicObj = useContext(PomoLogicContext)
 
   const [customHeight, setCustomHeight] = useState()
 
   const defaultPomo = { workPomo: 1500, breakPomo: 300 }
 
-  const persistentPomo = localStorage.getItem('pomos')
-    ? JSON.parse(localStorage.getItem('pomos'))
-    : defaultPomo
-
-  const [pomodoro, setPomodoro] = useState(persistentPomo.workPomo)
+  const [pomodoro, setPomodoro] = useState(PomoLogicObj.persistentPomo.workPomo)
 
   const [timerStarted, setTimerStarted] = useState(false)
-  const [playPause, setPlayPause] = useState(isPaused)
-  const [timer, setTimer] = useState(persistentPomo.workPomo)
-
-  const [customPomo, setCustomPomo] = useState(persistentPomo)
-  const [inputValue, setInputValue] = useState('')
-
-  // const [restart, setRestart] = useState(false)
-
+  const [timer, setTimer] = useState(PomoLogicObj.persistentPomo.workPomo)
 
   useEffect(() => {
-    console.log(PomoButtonsObj.restart)
     if (PomoButtonsObj.restart) {
       setTimer(pomodoro)
-      setPlayPause(true)
+      PomoButtonsObj.setPlayPause(false)
       setTimerStarted(false)
       PomoButtonsObj.setRestart(false)
       stopTimer()
@@ -106,83 +75,76 @@ const Pomodoro = () => {
     if (JSON.parse(localStorage.getItem('pomos')).length === 0) {
       JSON.stringify(localStorage.setItem('pomos', JSON.stringify(defaultPomo)))
     }
-  }, [playPause])
+    if (PomoButtonsObj.playPause) {
+      pomoTotalTimeLeft = (Date.now() + 1000 * pomodoro)
+      timeLeftInSeconds = (pomoTotalTimeLeft - Date.now()) / 1000
+    
+      if (timeLeftInSeconds <= 0) {
+        console.log("timeLeftInSeconds <= 0")
+        timeLeftInSeconds = pomodoro
+        setTimer(timeLeftInSeconds)
+      }
+
+      startTimer()  
+      PomoButtonsObj.setPlayPause(true), (interval = setInterval(updateTimer, 500))
+    } else {
+      PomoButtonsObj.setPlayPause(false), stopTimer()
+    }
+  }, [PomoButtonsObj.playPause])
 
   useEffect(() => {
-    setCustomPomo(inputValue)
-    localStorage.setItem('pomos', JSON.stringify(customPomo))
-  }, [inputValue])
+    if (PomoButtonsObj.switchTimer) {
+      switchTimer()
+    }
+  }, [PomoButtonsObj.switchTimer])
 
   useEffect(() => {
     streamerContextObj.streamerMode ? 
       setCustomHeight("40vh")
     : setCustomHeight(["45vh", "80vh"]) 
-    console.log(customHeight)
   }, [streamerContextObj.streamerMode])
 
   // sets the play/Pause button to Pause and TimerStarted to true
   const startTimer = () => {
-    isPaused = false
-    setPlayPause(false)
+    PomoButtonsObj.setPlayPause(true)
     setTimerStarted(true)
   }
 
   // stops the setInterval going in "interval" var
   const stopTimer = () => {
     clearInterval(interval)
-    isPaused = true
+    PomoButtonsObj.setPlayPause(false)
   }
-
-  // when the play/pause button is pressed
-  const playPauseTimer = () => {
-    endPomo = (Date.now() + 1000 * pomodoro)
-    timeLeftInSeconds = (endPomo - Date.now()) / 1000
-    if (timeLeftInSeconds <= 0) {
-      timeLeftInSeconds = pomodoro
-      setTimer(timeLeftInSeconds)
-    }
-    isPaused = !isPaused
-
-    if (!timerStarted) {
-      startTimer()
-    }
-
-    setTimerStarted(true)
-
-    isPaused
-      ? (setPlayPause(isPaused), stopTimer())
-      : (setPlayPause(isPaused), (interval = setInterval(updateTimer, 500)))
-  }
-
 
   // update the timer displayed. 
   const updateTimer = () => {
-    timeLeftInSeconds = (endPomo - Date.now()) / 1000
+    timeLeftInSeconds = (pomoTotalTimeLeft - Date.now()) / 1000
     if (timeLeftInSeconds < 0) {
       timeLeftInSeconds = 0
     }
     setTimer(timeLeftInSeconds)
     if (timeLeftInSeconds === 0) {
       stopTimer()
-      isPaused = true
-      setPlayPause(isPaused)
+      PomoButtonsObj.setPlayPause(true)
       playJingle()
     }
   }
 
-  const updateDuration = () => {
-    if(isPaused) {
-      if (pomodoro === persistentPomo.workPomo) {
-        setPomodoro(persistentPomo.breakPomo)
+  // switch between work and break timer
+  const switchTimer = () => {
+    if(!PomoButtonsObj.playPause) {
+      if (pomodoro === PomoLogicObj.persistentPomo.workPomo) {
+        setPomodoro(PomoLogicObj.persistentPomo.breakPomo)
   
-        timeLeftInSeconds = persistentPomo.breakPomo
-        setTimer(persistentPomo.breakPomo)
+        timeLeftInSeconds = PomoLogicObj.persistentPomo.breakPomo
+        setTimer(PomoLogicObj.persistentPomo.breakPomo)
       } else {
-        setPomodoro(persistentPomo.workPomo)
+        setPomodoro(PomoLogicObj.persistentPomo.workPomo)
   
-        timeLeftInSeconds = persistentPomo.workPomo
-        setTimer(persistentPomo.workPomo)
+        timeLeftInSeconds = PomoLogicObj.persistentPomo.workPomo
+        setTimer(PomoLogicObj.persistentPomo.workPomo)
       }
+      PomoButtonsObj.setSwitchTimer(false)
     }
   }
 
@@ -192,8 +154,6 @@ const Pomodoro = () => {
   }
 
   const displayTimeString = timeRemainingInSeconds => {
-
-
     let minutes = Math.floor(timeRemainingInSeconds / seconds_60)
     let seconds = Math.floor(timeRemainingInSeconds) % seconds_60
 
@@ -201,116 +161,34 @@ const Pomodoro = () => {
     return `${leftPad(`${minutes}`, 2, '0')}:${leftPad(`${seconds}`, 2, '0')}`
   }
 
-  const formatTimeString = userInput => {
-    // formats userInput 
-    parseInt(userInput)
-    let minutes = Math.floor(userInput * seconds_60)
-
-    return minutes
-  }
-
-  const submit = e => {
-    localStorage.setItem('pomos', JSON.stringify(customPomo))
-  }
-
-
   return (
 
-<Center minH={customHeight}>
+    <Center minH={customHeight}>
       <VStack spacing={6}>
         <Box>
           <Heading className='pomodoro' as='h2' size='3xl'>
               {displayTimeString(timer)}
           </Heading>
         </Box>
-        <Box>
+        { streamerContextObj.streamerMode ?
+        ""
+      :
+      <span>
+        <VStack spacing={6}>
+          <Box> 
             <ButtonGroup size='md' spacing={4} direction='row' align='center'>
-              <Button title="Switch timers" onClick={updateDuration}>
-                <Icon as={IoMdHourglass} />
-              </Button>
-              <Button title="Play/Pause Current Timer" onClick={playPauseTimer}>
-                {playPause ? <Icon as={IoMdPlay} /> : <Icon as={IoMdPause} />}
-              </Button>
-              <ButtonRestart></ButtonRestart>
+              <ButtonSwitchTimer />
+              <ButtonPlayPause />
+              <ButtonRestart />
             </ButtonGroup>
-        </Box>
-        <Box>
-          <Center>
-            <Popover isLazy>
-              <PopoverTrigger>
-                <Button title='Settings'>
-                  {' '}
-                  <Icon as={IoMdSettings} />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent>
-                <PopoverHeader fontWeight='semibold'>
-                  <Center>Settings</Center>
-                </PopoverHeader>
-                <PopoverArrow />
-                <PopoverCloseButton />
-                <form onSubmit={submit}>
+          </Box>
+          <Box>
+            <ButtonConfig />
+          </Box>
+      </VStack>
+    </span> 
+        }
 
-                <PopoverBody>
-
-                  <Flex>
-                    <Center flex={5}>
-                      <VStack spacing={8}>
-                      <Center>
-                        <InputGroup size='md'>
-
-                          <Input
-                            isRequired
-                            type='text'
-                            maxLength='3'
-                            onChange={e =>
-                              setInputValue({
-                                ...customPomo,
-                                workPomo: formatTimeString(e.target.value)
-                              })
-                            }
-                            placeholder='Work timer'
-                          />
-                              <InputRightAddon children='Minutes' />
-
-                        </InputGroup>
-                      </Center>
-                      <Center>
-                        <InputGroup size='md'>
-
-                          <Input
-                            isRequired
-                            type='text'
-                            maxLength='3'
-                            onChange={e =>
-                              setInputValue({
-                                ...customPomo,
-                                breakPomo: formatTimeString(e.target.value)
-                              })
-                            }
-                            placeholder='Break timer'
-                          />
-                              <InputRightAddon children='Minutes' />
-
-                        </InputGroup>
-                      </Center>
-                    </VStack>
-                      {/* Content of the actual Popover */}
-                    </Center>
-                  </Flex>
-
-                </PopoverBody>
-                <PopoverFooter>
-                  <InputGroup>
-                    <Input as='button' onClick={submit}>Update</Input>
-                  </InputGroup>
-                </PopoverFooter>
-                </form>
-
-              </PopoverContent>
-            </Popover>
-          </Center>
-        </Box>
       </VStack>
     </Center>
   )

@@ -9,7 +9,7 @@ const ButtonRestart = () => {
   const PomoButtonsObj = useContext(PomoButtonsContext)
 
   return (
-    <Button title="Switch timers" onClick={() => PomoButtonsObj.setRestart(true)}>
+    <Button title="Restart Current Timer" onClick={() => PomoButtonsObj.setRestart(true)}>
       <Icon as={IoMdRepeat} />
     </Button>
   )

@@ -17,7 +17,6 @@ const Header = (props) => {
     streamerContextObj.streamerMode ? 
       setCustomHeight("")
     : setCustomHeight("10vh") 
-    console.log(customHeight)
   }, [streamerContextObj])
 
   return (
