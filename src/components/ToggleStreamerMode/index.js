@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 
-import { useMediaQuery, Text, Link } from '@chakra-ui/react'
+import { useMediaQuery, Text, Link, Button, Icon } from '@chakra-ui/react'
+
+import { IoMdCamera } from 'react-icons/io'
 import { StreamerModeContext } from '../../App'
 
 const ToggleStreamerMode = () => {
@@ -16,13 +18,20 @@ const ToggleStreamerMode = () => {
 
   return (
       <span>
-    {isLargerThan1280 ?
+    { streamerContextObj.streamerMode ? 
+        <Button onClick={() => toggleStreamerMode(streamerContextObj)}>
+          <Text>
+            <Icon as={IoMdCamera} /> toggle streamer mode(beta)
+          </Text>
+        </Button>
+      : ( isLargerThan1280 ?
         <Link onClick={() => toggleStreamerMode(streamerContextObj)}>
           <Text as='u'>
             toggle streamer mode(beta)
           </Text>
         </Link>
-    : <></> }
+    : <></> ) }
+
     </span>
   )
 }

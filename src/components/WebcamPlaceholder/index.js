@@ -4,7 +4,7 @@ import ToggleStreamerMode from '../ToggleStreamerMode'
 import Pomodoro from '../Pomodoro'
 import DarkMode from '../DarkMode'
 
-import { Center, VStack, Box, ButtonGroup } from '@chakra-ui/react';
+import { Center, VStack, Box, ButtonGroup, HStack } from '@chakra-ui/react';
 import { PomoButtonsContext } from '../../App';
 
 import ButtonRestart from '../ButtonRestart'
@@ -20,7 +20,6 @@ const WebcamPlaceholder = () => {
     <Center minH={'100vh'}>
       <VStack spacing={6}>
         <DarkMode />
-        <ToggleStreamerMode />
         <VStack spacing={6}>
           <Box> 
             <ButtonGroup size='md' spacing={4} direction='row' align='center'>
@@ -33,7 +32,12 @@ const WebcamPlaceholder = () => {
             <ButtonConfig />
           </Box>
       </VStack>
-      <ToggleToDo />
+      <Box>
+        <HStack spacing={4}>
+          <ToggleStreamerMode />
+          <ToggleToDo />
+        </HStack>
+      </Box>
       </VStack>
     </Center>
   );

@@ -23,6 +23,7 @@ const Footer = () => {
     streamerContextObj.streamerMode ? 
       setCustomHeight("")
     : setCustomHeight("10vh") 
+    console.log(customHeight)
   }, [streamerContextObj])
   
   const [isLargerThan1280] = useMediaQuery('(min-width: 1280px)')
