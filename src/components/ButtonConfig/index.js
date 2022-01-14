@@ -38,7 +38,6 @@ const ButtonConfig = () => {
 
   useEffect(() => {
     PomoLogicObj.setCustomPomo(PomoLogicObj.inputValue)
-    localStorage.setItem('pomos', JSON.stringify(PomoLogicObj.customPomo))
   }, [PomoLogicObj.inputValue])
 
   const submit = e => {

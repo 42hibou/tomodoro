@@ -20,6 +20,10 @@ export const PomoButtonsContext = createContext()
 export const PomoLogicContext = createContext()
 
 const App = () => {
+  useEffect(() => {
+  //  console.log(`PomoButtonsObj.playPause: ${PomoButtonsObj.playPause}`)
+  //  console.log(`PomoButtonsObj.switchTimer: ${PomoButtonsObj.switchTimer}`)
+  })
   
   const [streamerMode, setStreamerMode] = useState(false)
 
@@ -39,6 +43,7 @@ const App = () => {
   PomoButtonsObj.switchTimer = switchTimer
   PomoButtonsObj.setSwitchTimer = setSwitchTimer
 
+  const defaultPomo = { workPomo: 1500, breakPomo: 300 }
   const persistentPomo = localStorage.getItem('pomos')
     ? JSON.parse(localStorage.getItem('pomos'))
     : defaultPomo
@@ -51,6 +56,7 @@ const App = () => {
   PomoLogicObj.customPomo = customPomo
   PomoLogicObj.setCustomPomo = setCustomPomo
   PomoLogicObj.persistentPomo = persistentPomo
+  PomoLogicObj.defaultPomo = defaultPomo
 
 
   return (

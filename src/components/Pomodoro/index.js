@@ -53,8 +53,6 @@ const Pomodoro = () => {
 
   const [customHeight, setCustomHeight] = useState()
 
-  const defaultPomo = { workPomo: 1500, breakPomo: 300 }
-
   const [pomodoro, setPomodoro] = useState(PomoLogicObj.persistentPomo.workPomo)
 
   const [timerStarted, setTimerStarted] = useState(false)
@@ -71,16 +69,11 @@ const Pomodoro = () => {
   }, [PomoButtonsObj.restart])
 
   useEffect(() => {
-    // if the localStorage somehow got corrupted, this helps.
-    if (JSON.parse(localStorage.getItem('pomos')).length === 0) {
-      JSON.stringify(localStorage.setItem('pomos', JSON.stringify(defaultPomo)))
-    }
     if (PomoButtonsObj.playPause) {
       pomoTotalTimeLeft = (Date.now() + 1000 * pomodoro)
       timeLeftInSeconds = (pomoTotalTimeLeft - Date.now()) / 1000
     
       if (timeLeftInSeconds <= 0) {
-        console.log("timeLeftInSeconds <= 0")
         timeLeftInSeconds = pomodoro
         setTimer(timeLeftInSeconds)
       }
@@ -106,8 +99,8 @@ const Pomodoro = () => {
 
   // sets the play/Pause button to Pause and TimerStarted to true
   const startTimer = () => {
-    PomoButtonsObj.setPlayPause(true)
     setTimerStarted(true)
+    PomoButtonsObj.setPlayPause(true)
   }
 
   // stops the setInterval going in "interval" var
@@ -144,8 +137,8 @@ const Pomodoro = () => {
         timeLeftInSeconds = PomoLogicObj.persistentPomo.workPomo
         setTimer(PomoLogicObj.persistentPomo.workPomo)
       }
-      PomoButtonsObj.setSwitchTimer(false)
     }
+    PomoButtonsObj.setSwitchTimer(false)
   }
 
   const playJingle = () => {
