@@ -63,6 +63,7 @@ const Pomodoro = () => {
       setTimer(pomodoro)
       PomoButtonsObj.setPlayPause(false)
       setTimerStarted(false)
+      computeTimer(true);
       PomoButtonsObj.setRestart(false)
       stopTimer()
     }
@@ -70,8 +71,7 @@ const Pomodoro = () => {
 
   useEffect(() => {
     if (PomoButtonsObj.playPause) {
-      pomoTotalTimeLeft = (Date.now() + 1000 * pomodoro)
-      timeLeftInSeconds = (pomoTotalTimeLeft - Date.now()) / 1000
+      computeTimer(!timeLeftInSeconds);
     
       if (timeLeftInSeconds <= 0) {
         timeLeftInSeconds = pomodoro
@@ -101,6 +101,12 @@ const Pomodoro = () => {
   const startTimer = () => {
     setTimerStarted(true)
     PomoButtonsObj.setPlayPause(true)
+  }
+
+  // Compute the values driving the timer behaviour
+  const computeTimer = (reset = false) => {
+    if (reset) timeLeftInSeconds = pomodoro;
+    pomoTotalTimeLeft = (Date.now() + 1000 * timeLeftInSeconds)
   }
 
   // stops the setInterval going in "interval" var
