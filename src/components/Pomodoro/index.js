@@ -70,8 +70,14 @@ const Pomodoro = () => {
 
   useEffect(() => {
     if (PomoButtonsObj.playPause) {
-      pomoTotalTimeLeft = (Date.now() + 1000 * pomodoro)
-      timeLeftInSeconds = (pomoTotalTimeLeft - Date.now()) / 1000
+      if (PomoButtonsObj.restart || !timeLeftInSeconds) {
+        // Start a clean timer
+        pomoTotalTimeLeft = (Date.now() + 1000 * pomodoro)
+        timeLeftInSeconds = (pomoTotalTimeLeft - Date.now()) / 1000
+      } else {
+        // Update end reference to take into account the paused time
+        pomoTotalTimeLeft = (Date.now() + 1000 * timeLeftInSeconds)
+      }
     
       if (timeLeftInSeconds <= 0) {
         timeLeftInSeconds = pomodoro
