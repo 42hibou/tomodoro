@@ -19,10 +19,11 @@ const Invoices = () => {
         <Heading
           as='h1' 
           size='4xl'
-          bgGradient='linear(to-r, teal.500, green.500)'
-          bgClip='text'
-          fontWeight='extrabold'
-          >Tomodoro</Heading>
+          // bgGradient='linear(to-r, teal.500, green.500)'
+          // bgClip='text'
+          // fontWeight='extrabold'
+          >tomodoro・ともドロ
+          </Heading>
           <Text as='samp' fontSize='lg'>
             Your Productivity Companion
           </Text>

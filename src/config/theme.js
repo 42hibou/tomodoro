@@ -6,6 +6,12 @@ const config = {
   useSystemColorMode: false
 }
 
-const theme = extendTheme({ config })
+const theme = extendTheme({
+  fonts: {
+    heading: 'Zen Antique Soft, serif',
+    body: 'Open Sans, sans-serif',
+  },
+  config,
+})
 
 export default theme
