@@ -9,7 +9,7 @@ import ReactDOM from 'react-dom'
 import reportWebVitals from './reportWebVitals'
 
 import App from './App'
-import Invoices from "./routes/invoices";
+import Landing from "./routes/landing";
 
 ReactDOM.render(
 
@@ -17,7 +17,7 @@ ReactDOM.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App/>} />
-        <Route path="/invoices" element={<Invoices/>} />
+        <Route path="/landing" element={<Landing/>} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,

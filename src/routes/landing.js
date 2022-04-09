@@ -14,7 +14,7 @@ import theme from '../config/theme';
 import { SearchIcon } from '@chakra-ui/icons';
 
 
-const Invoices = () => {
+const Landing = () => {
   return (
     <ChakraProvider theme={theme}>
       <Flex height='100vh' direction='column' align='center' justify='center' flexGrow='4'>
@@ -58,4 +58,4 @@ const Invoices = () => {
   )
 }
 
-export default Invoices
+export default Landing

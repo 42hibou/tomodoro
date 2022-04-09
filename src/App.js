@@ -69,7 +69,7 @@ const App = () => {
           <ChakraProvider theme={theme}>
             <span>
               <Header />
-              <Link to="/invoices">Invoices</Link> |{" "}
+              <Link to="/landing">Landing</Link> |{" "}
               <SimpleGrid columns={[1, null, 2]}>
                 <Pomodoro></Pomodoro>
                 <ToDo></ToDo>
