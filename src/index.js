@@ -1,14 +1,25 @@
 import React, { useEffect }  from 'react'
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
 
 import ReactDOM from 'react-dom'
 import reportWebVitals from './reportWebVitals'
 
 import App from './App'
+import Invoices from "./routes/invoices";
 
 ReactDOM.render(
 
   <React.StrictMode>
-      <App />      
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App/>} />
+        <Route path="/invoices" element={<Invoices/>} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 )

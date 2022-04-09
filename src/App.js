@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState } from 'react'
+import { Link } from "react-router-dom";
 
 import { ColorModeScript, 
   Heading, 
@@ -66,30 +67,15 @@ const App = () => {
       <PomoButtonsContext.Provider value={PomoButtonsObj}>
         <PomoLogicContext.Provider value={PomoLogicObj}>
           <ChakraProvider theme={theme}>
-            <ColorModeScript initialColorMode={theme.config.initialColorMode} />
-            { JSON.parse(localStorage.getItem('streamerMode')) ?
             <span>
-              <Grid 
-              templateColumns='repeat(6, 1fr)' >
-                <GridItem colSpan={2}>
-                  <Pomodoro></Pomodoro>
-                  <ToDo></ToDo>
-                </GridItem>
-                <GridItem colSpan={4}>
-                  <WebcamPlaceholder></WebcamPlaceholder>
-                </GridItem>
-              </Grid> 
-            </span> 
-              : 
-              <span>
-                <Header />
-                <SimpleGrid columns={[1, null, 2]}>
-                  <Pomodoro></Pomodoro>
-                  <ToDo></ToDo>
-                </SimpleGrid>   
-                <Footer />
-              </span>
-              }
+              <Header />
+              <Link to="/invoices">Invoices</Link> |{" "}
+              <SimpleGrid columns={[1, null, 2]}>
+                <Pomodoro></Pomodoro>
+                <ToDo></ToDo>
+              </SimpleGrid>   
+              <Footer />
+            </span>
           </ChakraProvider>
         </PomoLogicContext.Provider>
       </PomoButtonsContext.Provider>
